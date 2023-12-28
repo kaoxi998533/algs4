@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Comparator;
 
@@ -58,4 +59,13 @@ public class Point implements Comparable<Point> {
             }
         };
     }              // compare two points by slopes they make with this point
+
+    public static void main(String[] args) {
+        Point point = new Point(100, 50);
+        Point pt1 = new Point(1, 1);
+        Point pt2 = new Point(1, 1);
+        pt1.draw();
+        StdOut.println(pt1.slopeTo(pt2));
+
+    }
 }

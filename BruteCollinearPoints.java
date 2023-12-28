@@ -1,21 +1,31 @@
-import java.util.LinkedList;
+import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
+import java.util.Arrays;
 
 public class BruteCollinearPoints {
     private int n = 0;
-    private LinkedList<LineSegment> segments = new LinkedList<>();
+    private Queue<LineSegment> segments = new Queue<>();
 
     public BruteCollinearPoints(Point[] points) {
         if (points == null)
             throw new IllegalArgumentException("");
         for (int i = 0; i < points.length; i++) {
-            for (int j = 0; j < points.length; j++) {
-                for (int k = 0; k < points.length; k++) {
-                    for (int m = 0; m < points.length; m++) {
-                        if (points[i].slopeTo(points[j]) == Integer.MAX_VALUE
-                                && points[j].slopeTo(points[k]) == Integer.MAX_VALUE
-                                && points[k].slopeTo(points[m]) == Integer.MAX_VALUE) {
-                            segments.add(new LineSegment(points[i], points[m]));
-                            n++;
+            for (int j = i + 1; j < points.length; j++) {
+                for (int k = j + 1; k < points.length; k++) {
+                    for (int m = k + 1; m < points.length; m++) {
+                        if (Math.abs(points[i].slopeTo(points[j])) ==
+                                Math.abs(points[j].slopeTo(points[k])) &&
+                                Math.abs(points[j].slopeTo(points[k])) ==
+                                        Math.abs((points[k].slopeTo(points[m])))) {
+                            Point[] arr = {
+                                    points[i], points[j],
+                                    points[k], points[m]
+                            };
+                            Arrays.sort(arr);
+                            checkEnqueue(new LineSegment(arr[0], arr[3]));
                         }
                     }
                 }
@@ -23,6 +33,16 @@ public class BruteCollinearPoints {
         }
 
     }    // finds all line segments containing 4 points
+
+    private void checkEnqueue(LineSegment segment) {
+        for (LineSegment seg : segments) {
+            if (seg.toString().equals(segment.toString())) {
+                return;
+            }
+        }
+        n++;
+        segments.enqueue(segment);
+    }
 
     public int numberOfSegments() {
         return n;
@@ -37,4 +57,33 @@ public class BruteCollinearPoints {
         return arr;
     }                // the line segments
 
+    public static void main(String[] args) {
+
+        // read the n points from a file
+        In in = new In(args[0]);
+        int n = in.readInt();
+        Point[] points = new Point[n];
+        for (int i = 0; i < n; i++) {
+            int x = in.readInt();
+            int y = in.readInt();
+            points[i] = new Point(x, y);
+        }
+
+        // draw the points
+        StdDraw.enableDoubleBuffering();
+        StdDraw.setXscale(0, 32768);
+        StdDraw.setYscale(0, 32768);
+        for (Point p : points) {
+            p.draw();
+        }
+        StdDraw.show();
+
+        // print and draw the line segments
+        BruteCollinearPoints collinear = new BruteCollinearPoints(points);
+        for (LineSegment segment : collinear.segments()) {
+            StdOut.println(segment);
+            segment.draw();
+        }
+        StdDraw.show();
+    }
 }
