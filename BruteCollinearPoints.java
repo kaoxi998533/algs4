@@ -10,16 +10,19 @@ public class BruteCollinearPoints {
     private Queue<LineSegment> segments = new Queue<>();
 
     public BruteCollinearPoints(Point[] points) {
-        if (points == null)
-            throw new IllegalArgumentException("");
+        if (points == null) throw new IllegalArgumentException("");
+        for (Point p : points)
+            if (p == null) throw new IllegalArgumentException("");
+
+
         for (int i = 0; i < points.length; i++) {
             for (int j = i + 1; j < points.length; j++) {
                 for (int k = j + 1; k < points.length; k++) {
                     for (int m = k + 1; m < points.length; m++) {
-                        if (Math.abs(points[i].slopeTo(points[j])) ==
-                                Math.abs(points[j].slopeTo(points[k])) &&
-                                Math.abs(points[j].slopeTo(points[k])) ==
-                                        Math.abs((points[k].slopeTo(points[m])))) {
+                        if (points[i].slopeTo(points[j]) ==
+                                points[j].slopeTo(points[k]) &&
+                                points[j].slopeTo(points[k]) ==
+                                        points[k].slopeTo(points[m])) {
                             Point[] arr = {
                                     points[i], points[j],
                                     points[k], points[m]

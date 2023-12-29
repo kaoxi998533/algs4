@@ -1,5 +1,5 @@
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.Stack;
+import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -13,13 +13,14 @@ import java.util.Comparator;
  **************************************************************************** */
 public class FastCollinearPoints {
 
-    private Stack<LineSegment> segmentStack = new Stack<>();
+
+    private Queue<LineSegment> segmentQueue = new Queue<>();
 
     public FastCollinearPoints(Point[] points) {
         int len = points.length;
         Point[] pointArr = new Point[len];
-        int contArrIndex = 1;
         for (int i = 0; i < len; i++) {
+            int contArrIndex = 1;
             for (int j = 0; j < len; j++) {
                 // copy of array
                 pointArr[j] = points[j];
@@ -30,22 +31,18 @@ public class FastCollinearPoints {
                 if (comparator.compare(pointArr[j], pointArr[j - 1]) == 0) {
                     contArrIndex++;
                 }
-                else {
-                    if (contArrIndex >= 4) {
-                        if (isSubsegment(pointArr,
-                                         j - contArrIndex,
-                                         pointArr[j - 1].slopeTo(pointArr[j - 2]))
-                                || pointArr[j - 1].slopeTo(pointArr[j - 2]) < 0) {
-                            // is subsegment is likely the cause of bug
-                            contArrIndex = 1;
-                            continue;
-                        }
-                        segmentStack.push(
-                                new LineSegment(pointArr[j - 1],
-                                                pointArr[j - contArrIndex]
-                                ));
-                        contArrIndex = 1;
 
+                else {
+                    if (contArrIndex >= 3) {
+                        Point[] arr = new Point[contArrIndex + 1];
+                        int arrIndex = 0;
+                        for (int m = j - contArrIndex; m <= j - 1; m++) {
+                            arr[arrIndex++] = pointArr[m];
+                        }
+                        arr[arrIndex] = pointArr[0];
+                        Arrays.sort(arr);
+                        checkEnqueue(new LineSegment(arr[0], arr[arr.length - 1]));
+                        contArrIndex = 1;
                     }
                     else {
                         // compared to previous, not equal, and the array index is <4
@@ -53,32 +50,39 @@ public class FastCollinearPoints {
                     }
 
                 }
+
+            }
+            if (contArrIndex >= 3) {
+                Point[] arr = new Point[contArrIndex + 1];
+                int arrIndex = 0;
+                for (int m = len - contArrIndex; m <= len - 1; m++) {
+                    arr[arrIndex++] = pointArr[m];
+                }
+                arr[arrIndex] = pointArr[0];
+                Arrays.sort(arr);
+                checkEnqueue(new LineSegment(arr[0], arr[arr.length - 1]));
             }
         }
     }     // finds all line segments containing 4 or more points
 
-    private boolean isSubsegment(Point[] arr, int pointIndex, double originalSlope) {
-        // we compare the point at pointIndex with the other points for slope
-        // if we find the target slope then return false
-        double targetSlope = -originalSlope;
-        Point pointToBeCompared = arr[pointIndex];
-        for (int i = 0; i < pointIndex; i++) {
-            if (pointToBeCompared.slopeTo(arr[i]) == targetSlope) {
-                StdOut.println(pointToBeCompared + "and " + arr[i]);
-                return true;
+    private void checkEnqueue(LineSegment segment) {
+        int len = segmentQueue.size();
+        for (LineSegment seg : segmentQueue) {
+            if (seg.toString().equals(segment.toString())) {
+                return;
             }
         }
-        return false;
+        segmentQueue.enqueue(segment);
     }
 
     public int numberOfSegments() {
-        return segmentStack.size();
+        return segmentQueue.size();
     }       // the number of line segments
 
     public LineSegment[] segments() {
-        LineSegment[] arr = new LineSegment[segmentStack.size()];
+        LineSegment[] arr = new LineSegment[segmentQueue.size()];
         int i = 0;
-        for (LineSegment p : segmentStack)
+        for (LineSegment p : segmentQueue)
             arr[i++] = p;
         return arr;
     }                // the line segments

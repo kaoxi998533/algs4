@@ -30,29 +30,25 @@ public class Point implements Comparable<Point> {
 
     public int compareTo(Point that) {
         if (this.y == that.y) {
-            if (this.x < that.x)
-                return -1;
-            else if (this.x > that.x)
-                return 1;
-            else
-                return 0;
+            return Integer.compare(this.x, that.x);
         }
         return this.y < that.y ? -1 : 1;
     }     // compare two points by y-coordinates, breaking ties by x-coordinates
 
     public double slopeTo(Point that) {
-        if (this.x == that.x && this.y == that.y) return Integer.MIN_VALUE;
-        else if (this.x == that.x) return 0;
-        else if (this.y == this.x) return Integer.MAX_VALUE;
+        if (this.x == that.x && this.y == that.y) return -1 / 0.0;
+        else if (this.x == that.x) return 1 / 0.0;
+        else if (this.y == that.y) return 0.0;
         else return (this.y - that.y) / (double) (this.x - that.x);
     }       // the slope between this point and that point
 
     public Comparator<Point> slopeOrder() {
+        Point p = this;
         return new Comparator<Point>() {
             public int compare(Point o1, Point o2) {
-                if (o1.slopeTo(Point.this) < o2.slopeTo(Point.this))
+                if (o1.slopeTo(p) < o2.slopeTo(p))
                     return -1;
-                else if (o1.slopeTo(Point.this) > o2.slopeTo(Point.this))
+                else if (o1.slopeTo(p) > o2.slopeTo(p))
                     return 1;
                 else
                     return 0;
@@ -61,8 +57,7 @@ public class Point implements Comparable<Point> {
     }              // compare two points by slopes they make with this point
 
     public static void main(String[] args) {
-        Point point = new Point(100, 50);
-        Point pt1 = new Point(1, 1);
+        Point pt1 = new Point(1, 0);
         Point pt2 = new Point(1, 1);
         pt1.draw();
         StdOut.println(pt1.slopeTo(pt2));
